@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prepe - Pancreas Anatomy (Hindi + English)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- Required libraries for PDF generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+    <style>
+        html {
+            scroll-behavior: smooth;
+        }
+        body {
+            font-family: 'Poppins', 'Noto Sans Devanagari', sans-serif;
+            background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%);
+        }
+        .scroll-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow-y: auto;
+            gap: 2.5rem; /* 40px */
+            padding: 2.5rem 0;
+            width: 100%;
+            min-height: 100vh;
+            scrollbar-width: none;
+        }
+        .scroll-container::-webkit-scrollbar { display: none; }
+        .slide {
+            flex-shrink: 0;
+            width: 95%; 
+            max-width: 1080px;
+            height: auto;
+            background-color: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            color: #1a202c;
+            position: relative;
+            box-shadow: 0 20px 60px -10px rgba(249, 115, 22, 0.15);
+            border-radius: 36px;
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            overflow: hidden;
+            padding: 1.5rem; /* 24px */
+            display: flex;
+            flex-direction: column;
+            background-image: url('data:image/svg+xml;utf8,<svg width="350" height="200" xmlns="http://www.w3.org/2000/svg"><text x="50%" y="50%" font-size="50" font-weight="bold" font-family="Poppins, sans-serif" fill="rgba(249, 115, 22, 0.04)" text-anchor="middle" dominant-baseline="middle" transform="rotate(-30 175 100)">Prepe</text></svg>');
+        }
+        @media (min-width: 640px) {
+            .slide {
+                padding: 2.8125rem; /* 45px */
+            }
+        }
+        .brand-logo {
+            position: absolute;
+            top: 1.5rem; /* 24px */
+            left: 1.5rem; /* 24px */
+            font-size: 2rem; /* 32px */
+            font-weight: 700;
+            color: #f97316;
+            z-index: 1;
+        }
+        @media (min-width: 640px) {
+           .brand-logo {
+                top: 2.8125rem; /* 45px */
+                left: 2.8125rem; /* 45px */
+                font-size: 2.125rem; /* 34px */
+           }
+        }
+        #download-pdf-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-image: linear-gradient(to right, #ea580c 0%, #f97316 51%, #ea580c 100%);
+            background-size: 200% auto;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 9999px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            box-shadow: 0 8px 20px rgba(249, 115, 22, 0.4);
+            transition: all 0.3s ease-in-out;
+            z-index: 100;
+            border: none;
+        }
+        @media (min-width: 640px) {
+            #download-pdf-btn {
+                bottom: 30px;
+                right: 30px;
+                padding: 15px 30px;
+                font-size: 1.125rem;
+            }
+        }
+        #download-pdf-btn:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 12px 28px rgba(249, 115, 22, 0.5);
+            background-position: right center;
+        }
+        #loader-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.6); display: none; justify-content: center;
+            align-items: center; z-index: 1000; color: white; font-size: 24px;
+            font-weight: 600; backdrop-filter: blur(5px);
+        }
+        .slide-title {
+            font-size: 2rem; /* 32px */
+            font-weight: 700; text-align: center; margin-top: 4rem;
+            margin-bottom: 2rem; color: #1a202c; letter-spacing: -1.5px;
+            position: relative; z-index: 1;
+        }
+        @media (min-width: 640px) {
+            .slide-title {
+                font-size: 2.875rem; /* 46px */
+                margin-top: 3.75rem; /* 60px */
+                margin-bottom: 1.875rem; /* 30px */
+            }
+        }
+        .card {
+             background-color: rgba(255, 255, 255, 0.95);
+             border-radius: 22px; padding: 1.25rem;
+             box-shadow: 0 10px 25px rgba(249, 115, 22, 0.05);
+             border: 1px solid rgba(249, 115, 22, 0.1);
+             display: flex; flex-direction: column;
+             transition: all 0.3s ease-in-out;
+             position: relative; z-index: 1;
+        }
+        .card:not(.mind-map-card):hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 35px rgba(249, 115, 22, 0.12);
+        }
+        .card-title {
+             font-size: 1.125rem; /* 18px */
+             font-weight: 700; margin-bottom: 0.75rem;
+             padding-bottom: 0.625rem; border-bottom: 1px solid rgba(0,0,0,0.07);
+             display: flex; align-items: center;
+        }
+        @media (min-width: 640px) {
+            .card-title { font-size: 1.25rem; /* 20px */ }
+        }
+        .card-title .icon {
+            margin-right: 0.75rem; font-size: 1.25rem; width: 36px; height: 36px;
+            display: grid; place-items: center; border-radius: 50%;
+            background-color: var(--icon-bg, #fef2e5); color: var(--icon-color, #f97316);
+        }
+        .card-content {
+            font-size: 0.9375rem; /* 15px */
+            line-height: 1.75; flex-grow: 1;
+        }
+        .badge-chip {
+            display: inline-block; padding: 4px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: 600; margin-right: 4px; margin-bottom: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div id="loader-overlay">
+        <span><i class="fa-solid fa-spinner fa-spin mr-3"></i>Generating Notes PDF...</span>
+    </div>
+
+    <div class="scroll-container">
+        <!-- Slide 1: HERO & INTRO -->
+        <div id="slide1" class="slide">
+            <div class="brand-logo">Prepe</div>
+            <div class="absolute top-6 right-8 text-right hidden sm:block">
+                <div class="text-sm font-bold text-orange-600">ANATOMY & PHYSIOLOGY</div>
+                <div class="text-xs text-gray-500">One Page Note</div>
+            </div>
+            <h1 class="slide-title">🩺 Anatomy: PANCREAS (अग्नाशय)</h1>
+            
+            <!-- Desktop Mindmap Layout -->
+            <div class="hidden md:flex flex-grow items-center justify-center">
+                <div class="w-full h-full relative flex items-center justify-center" style="min-height: 700px;">
+                    <svg class="absolute top-0 left-0 w-full h-full z-10" viewbox="0 0 990 990">
+                        <defs><linearGradient id="lineGrad" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" style="stop-color:#fdbf72;stop-opacity:1" /><stop offset="100%" style="stop-color:#f97316;stop-opacity:1" /></linearGradient></defs>
+                        <line x1="495" y1="495" x2="215" y2="280" stroke="url(#lineGrad)" stroke-width="2.5" /><line x1="495" y1="495" x2="775" y2="280" stroke="url(#lineGrad)" stroke-width="2.5" /><line x1="495" y1="495" x2="111" y2="495" stroke="url(#lineGrad)" stroke-width="2.5" /><line x1="495" y1="495" x2="879" y2="495" stroke="url(#lineGrad)" stroke-width="2.5" /><line x1="495" y1="495" x2="215" y2="710" stroke="url(#lineGrad)" stroke-width="2.5" /><line x1="495" y1="495" x2="775" y2="710" stroke="url(#lineGrad)" stroke-width="2.5" />
+                    </svg>
+                    <div class="absolute w-72 h-72 bg-gradient-to-br from-orange-500 to-red-500 rounded-full flex flex-col items-center justify-center text-white shadow-2xl z-20 border-4 border-orange-200">
+                        <i class="fa-solid fa-dna text-4xl mb-2 opacity-90"></i>
+                        <h2 class="text-4xl font-bold">PANCREAS</h2>
+                        <p class="text-lg font-semibold">(Mixed Gland)</p>
+                        <span class="text-xs bg-white/20 px-2 py-1 rounded mt-2">Exocrine + Endocrine</span>
+                    </div>
+
+                    <!-- Top Left -->
+                    <div class="card mind-map-card absolute w-64 text-center transform -translate-x-[22rem] -translate-y-52 z-30">
+                        <h3 class="card-title justify-center text-base" style="--icon-color: #c2410c; --icon-bg: #fff7ed;"><i class="fa-solid fa-ruler-combined icon"></i> Structure (संरचना)</h3>
+                        <ul class="text-xs list-disc list-inside text-left">
+                            <li><strong>Shape:</strong> Leaf-like (पत्ते जैसा) या Fish-shaped.</li>
+                            <li><strong>Loc:</strong> Retroperitoneal (Stomach के पीछे).</li>
+                            <li><strong>Size:</strong> 12-15 cm लंबा, 60-100 gm वजन.</li>
+                            <li><strong>Color:</strong> Greyish-pink (गुलाबी-धूसर).</li>
+                        </ul>
+                    </div>
+
+                    <!-- Top Right -->
+                    <div class="card mind-map-card absolute w-64 text-center transform translate-x-[22rem] -translate-y-52 z-30">
+                        <h3 class="card-title justify-center text-base" style="--icon-color: #4b5563; --icon-bg: #f3f4f6;"><i class="fa-solid fa-shapes icon"></i> Parts (भाग)</h3>
+                        <ul class="text-xs list-disc list-inside text-left">
+                            <li><strong>Head:</strong> C-shaped Duodenum में फंसा होता है.</li>
+                            <li><strong>Neck:</strong> Head और Body को जोड़ता है.</li>
+                            <li><strong>Body:</strong> मुख्य लंबा हिस्सा.</li>
+                            <li><strong>Tail:</strong> पतला सिरा जो Spleen (प्लीहा) को छूता है.</li>
+                        </ul>
+                    </div>
+
+                    <!-- Mid Left -->
+                    <div class="card mind-map-card absolute w-64 text-center transform -translate-x-96 z-30">
+                        <h3 class="card-title justify-center text-base" style="--icon-color: #2563eb; --icon-bg: #eff6ff;"><i class="fa-solid fa-microscope icon"></i> Dual Nature (द्वैध प्रकृति)</h3>
+                        <ul class="text-xs list-disc list-inside text-left">
+                            <li><strong>Exocrine (99%):</strong> Acini Cells (पाचक रस बनाती हैं).</li>
+                            <li><strong>Endocrine (1%):</strong> Islets of Langerhans (Hormones).</li>
+                            <li><strong>Lobules:</strong> संयोजी ऊतक (Connective tissue) से बंटा होता है.</li>
+                        </ul>
+                    </div>
+
+                    <!-- Mid Right -->
+                    <div class="card mind-map-card absolute w-64 text-center transform translate-x-96 z-30">
+                        <h3 class="card-title justify-center text-base" style="--icon-color: #16a34a; --icon-bg: #f0fdf4;"><i class="fa-solid fa-bezier-curve icon"></i> Duct System (नलिकाएं)</h3>
+                        <ul class="text-xs list-disc list-inside text-left">
+                            <li><strong>Main Duct (Wirsung):</strong> पूरा रस (Juice) एकत्र करती है.</li>
+                            <li><strong>Ampulla of Vater:</strong> जहां Bile Duct और Pancreatic Duct मिलती हैं.</li>
+                            <li><strong>Sphincter of Oddi:</strong> प्रवाह (Flow) को नियंत्रित करता है.</li>
+                        </ul>
+                    </div>
+
+                    <!-- Bottom Left -->
+                    <div class="card mind-map-card absolute w-64 text-center transform -translate-x-[22rem] translate-y-52 z-30">
+                        <h3 class="card-title justify-center text-base" style="--icon-color: #7e22ce; --icon-bg: #f5f3ff;"><i class="fa-solid fa-flask icon"></i> Pancreatic Juice</h3>
+                        <ul class="text-xs list-disc list-inside text-left">
+                            <li><strong>Vol:</strong> 1000-1500 ml/day.</li>
+                            <li><strong>Nature:</strong> Alkaline (pH 8.0).</li>
+                            <li><strong>Content:</strong> Bicarbonate Ions (Acid को Neutralize करते हैं).</li>
+                            <li><strong>Enzymes:</strong> Trypsin, Amylase, Lipase.</li>
+                        </ul>
+                    </div>
+
+                    <!-- Bottom Right -->
+                    <div class="card mind-map-card absolute w-64 text-center transform translate-x-[22rem] translate-y-52 z-30">
+                        <h3 class="card-title justify-center text-base" style="--icon-color: #ca8a04; --icon-bg: #fefce8;"><i class="fa-solid fa-capsules icon"></i> Hormones</h3>
+                        <ul class="text-xs list-disc list-inside text-left">
+                            <li><strong>Alpha Cells:</strong> Glucagon (Sugar बढ़ाता है).</li>
+                            <li><strong>Beta Cells:</strong> Insulin (Sugar घटाता है).</li>
+                            <li><strong>Delta Cells:</strong> Somatostatin (Control).</li>
+                            <li><strong>Location:</strong> मुख्य रूप से Tail भाग में.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+             <!-- Mobile Vertical Layout -->
+            <div class="md:hidden flex flex-col items-center gap-4">
+                <div class="w-60 h-60 bg-gradient-to-br from-orange-500 to-red-500 rounded-full flex flex-col items-center justify-center text-white shadow-2xl mb-4 border-4 border-orange-200">
+                    <i class="fa-solid fa-dna text-4xl mb-2"></i>
+                    <h2 class="text-3xl font-bold">PANCREAS</h2>
+                    <p class="text-xl font-semibold">(अग्नाशय)</p>
+                </div>
+                <div class="w-full grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div class="card">
+                        <h3 class="card-title" style="--icon-color: #c2410c; --icon-bg: #fff7ed;"><i class="fa-solid fa-ruler-combined icon"></i> Intro & Structure</h3>
+                        <ul class="text-sm list-disc list-inside text-left">
+                            <li><strong>Heterocrine Gland:</strong> यह मिश्रित (Exocrine + Endocrine) ग्रंथि है.</li>
+                            <li><strong>Location:</strong> Stomach के पीछे (Retroperitoneal).</li>
+                            <li><strong>Shape:</strong> पत्ते जैसा (Leaf-like).</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h3 class="card-title" style="--icon-color: #4b5563; --icon-bg: #f3f4f6;"><i class="fa-solid fa-shapes icon"></i> Parts & Ducts</h3>
+                        <ul class="text-sm list-disc list-inside text-left">
+                            <li><strong>Parts:</strong> Head, Neck, Body, Tail.</li>
+                            <li><strong>Main Duct:</strong> Duct of Wirsung.</li>
+                            <li><strong>Opening:</strong> Duodenum में (Sphincter of Oddi).</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h3 class="card-title" style="--icon-color: #2563eb; --icon-bg: #eff6ff;"><i class="fa-solid fa-microscope icon"></i> Internal Structure</h3>
+                        <ul class="text-sm list-disc list-inside text-left">
+                            <li><strong>Acini (99%):</strong> पाचक रस (Enzymes) बनाती हैं.</li>
+                            <li><strong>Islets (1%):</strong> हार्मोन (Insulin/Glucagon) बनाते हैं.</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h3 class="card-title" style="--icon-color: #16a34a; --icon-bg: #f0fdf4;"><i class="fa-solid fa-flask icon"></i> Physiology</h3>
+                        <ul class="text-sm list-disc list-inside text-left">
+                            <li><strong>Juice:</strong> Alkaline (pH 8.0) द्रव.</li>
+                            <li><strong>Function:</strong> पाचन (Digestion) और Sugar Control.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 2: DATA & EXOCRINE PHYSIOLOGY -->
+        <div id="slide2" class="slide">
+            <div class="brand-logo">Prepe</div>
+            <h1 class="slide-title">⚡ Physiology: Enzymes & Digestion</h1>
+            <div class="flex-grow grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Comparison Table Area -->
+                <div class="card lg:col-span-3 p-4 md:p-6">
+                    <h3 class="card-title text-gray-700 m-0 pb-4 text-center md:text-left" style="border:none;"><i class="fa-solid fa-table-list icon"></i> Acini vs Islets (Microscopic Difference)</h3>
+                    <div class="w-full overflow-x-auto">
+                        <table class="w-full text-sm text-left text-gray-600">
+                            <thead class="text-xs text-gray-700 uppercase bg-gray-50">
+                                <tr>
+                                    <th scope="col" class="px-6 py-3">Feature</th>
+                                    <th scope="col" class="px-6 py-3">Acini (Exocrine)</th>
+                                    <th scope="col" class="px-6 py-3">Islets (Endocrine)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="bg-white border-b">
+                                    <td class="px-6 py-4 font-bold">Proportion</td>
+                                    <td class="px-6 py-4">99% (अधिकांश भाग)</td>
+                                    <td class="px-6 py-4">1% (बहुत कम)</td>
+                                </tr>
+                                <tr class="bg-gray-50 border-b">
+                                    <td class="px-6 py-4 font-bold">Secretion</td>
+                                    <td class="px-6 py-4">Enzymes (Pancreatic Juice)</td>
+                                    <td class="px-6 py-4">Hormones (Insulin, etc.)</td>
+                                </tr>
+                                <tr class="bg-white">
+                                    <td class="px-6 py-4 font-bold">Ducts</td>
+                                    <td class="px-6 py-4">Ducts में खुलती हैं</td>
+                                    <td class="px-6 py-4">Ductless (सीधे खून में)</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 lg:col-span-3 gap-6">
+                    <!-- Enzyme 1 -->
+                    <div class="card sm:col-span-2 lg:col-span-1">
+                        <h3 class="card-title" style="--icon-color: #1e40af; --icon-bg: #dbeafe;"><i class="fa-solid fa-bread-slice icon"></i> Amylase (Carbs)</h3>
+                        <ul class="card-content text-sm space-y-3 pl-2">
+                            <li><strong>Target:</strong> Carbohydrates (Starch).</li>
+                            <li><strong>Product:</strong> Maltose.</li>
+                            <li>Salivary Amylase से ज्यादा शक्तिशाली होता है.</li>
+                        </ul>
+                    </div>
+
+                    <!-- Enzyme 2 -->
+                    <div class="card sm:col-span-2 lg:col-span-1">
+                        <h3 class="card-title" style="--icon-color: #166534; --icon-bg: #dcfce7;"><i class="fa-solid fa-drumstick-bite icon"></i> Proteases (Protein)</h3>
+                        <ul class="card-content text-sm space-y-3 pl-2">
+                            <li><strong>Forms:</strong> Trypsinogen, Chymotrypsinogen (Inactive).</li>
+                            <li><strong>Activation:</strong> 'Enterokinase' इन्हें Active (Trypsin) करता है.</li>
+                            <li><strong>Action:</strong> प्रोटीन को तोड़ते हैं.</li>
+                        </ul>
+                    </div>
+
+                    <!-- Enzyme 3 -->
+                    <div class="card sm:col-span-2 lg:col-span-1">
+                        <h3 class="card-title" style="--icon-color: #c2410c; --icon-bg: #ffedd5;"><i class="fa-solid fa-bacon icon"></i> Lipase (Fats)</h3>
+                        <div class="card-content space-y-3 text-xs pt-2">
+                            <div>
+                                <h4 class="font-bold text-orange-700">Main Fat Enzyme</h4>
+                                <p class="mt-1">यह वसा (Lipids) का पाचन करता है.</p>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-green-700">End Product</h4>
+                                <p class="mt-1">Fatty Acids + Glycerol.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 3: ENDOCRINE (HORMONES) -->
+        <div id="slide3" class="slide">
+            <div class="brand-logo">Prepe</div>
+            <h1 class="slide-title">🩸 Endocrine: Islets of Langerhans</h1>
+            <div class="flex-grow grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Left: Cells Breakdown -->
+                <div class="card md:row-span-2">
+                    <h3 class="card-title" style="--icon-color: #2563eb; --icon-bg: #dbeafe;"><i class="fa-solid fa-users icon"></i> Cell Types (कोशिकाओं के प्रकार)</h3>
+                    <div class="card-content flex flex-col justify-around text-sm gap-4">
+                        
+                        <!-- Alpha Cells -->
+                        <div class="border-b-2 border-dashed border-gray-200 pb-3">
+                            <h4 class="font-bold text-lg text-blue-800 flex items-center"><i class="fa-solid fa-arrow-trend-up text-2xl w-8 mr-2"></i> Alpha Cells (α) - 20%</h4>
+                            <ul class="mt-2 list-disc list-inside text-left px-2 md:px-4 space-y-1">
+                                <li><strong>Secrete:</strong> Glucagon hormone.</li>
+                                <li><strong>Function:</strong> Blood Sugar को <strong>बढ़ाता (Increase)</strong> है.</li>
+                                <li><strong>Method:</strong> Liver में Glycogen को तोड़ता है.</li>
+                            </ul>
+                        </div>
+
+                        <!-- Beta Cells -->
+                        <div class="py-3 border-b-2 border-dashed border-gray-200">
+                            <h4 class="font-bold text-lg text-green-800 flex items-center"><i class="fa-solid fa-arrow-trend-down text-2xl w-8 mr-2"></i> Beta Cells (β) - 70%</h4>
+                            <ul class="mt-2 list-disc list-inside text-left px-2 md:px-4 space-y-1">
+                                <li><strong>Secrete:</strong> Insulin hormone.</li>
+                                <li><strong>Function:</strong> Blood Sugar को <strong>घटाता (Decrease)</strong> है.</li>
+                                <li><strong>Method:</strong> Glucose को कोशिकाओं (Cells) में भेजता है.</li>
+                            </ul>
+                        </div>
+
+                        <!-- Delta Cells -->
+                        <div class="pt-3">
+                            <h4 class="font-bold text-lg text-yellow-800 flex items-center"><i class="fa-solid fa-traffic-light text-2xl w-8 mr-2"></i> Delta Cells (δ) - 10%</h4>
+                            <ul class="mt-2 list-disc list-inside text-left px-2 md:px-4 space-y-1">
+                                <li><strong>Secrete:</strong> Somatostatin.</li>
+                                <li><strong>Function:</strong> यह "Monitor" है.</li>
+                                <li>Insulin और Glucagon दोनों को रोकता (Inhibit) है.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Top: Homeostasis -->
+                <div class="card">
+                    <h3 class="card-title" style="--icon-color: #ea580c; --icon-bg: #fff7ed;"><i class="fa-solid fa-scale-balanced icon"></i> Glucose Homeostasis</h3>
+                    <ul class="card-content text-sm space-y-2 pl-2">
+                        <li><i class="fa-solid fa-check text-orange-500 w-5"></i> <strong>Normal Sugar:</strong> 70-110 mg/dl.</li>
+                        <li><i class="fa-solid fa-check text-orange-500 w-5"></i> <strong>Antagonistic:</strong> Insulin और Glucagon एक-दूसरे के विपरीत काम करते हैं.</li>
+                        <li><i class="fa-solid fa-check text-orange-500 w-5"></i> <strong>Fasting:</strong> Glucagon काम करता है.</li>
+                        <li><i class="fa-solid fa-check text-orange-500 w-5"></i> <strong>After Meal:</strong> Insulin काम करता है.</li>
+                    </ul>
+                </div>
+
+                <!-- Right Bottom: Location Info -->
+                <div class="card">
+                    <h3 class="card-title" style="--icon-color: #7e22ce; --icon-bg: #f3e8ff;"><i class="fa-solid fa-location-dot icon"></i> Islets Location</h3>
+                    <ul class="card-content text-sm space-y-2 pl-2">
+                        <li>Pancreas में लगभग 1-2 मिलियन Islets होते हैं.</li>
+                        <li>ये मुख्य रूप से Pancreas की <strong>Tail (पूंछ)</strong> वाले हिस्से में सबसे ज्यादा पाए जाते हैं.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 4: CLINICAL & REVIEW -->
+        <div id="slide4" class="slide">
+            <div class="brand-logo">Prepe</div>
+            <h1 class="slide-title">🏥 Clinical & Exam Review</h1>
+            <div class="flex-grow w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+                
+                <!-- Diabetes -->
+                <div class="card">
+                    <h3 class="card-title"><i class="fa-solid fa-syringe icon"></i> Diabetes Mellitus</h3>
+                    <ul class="card-content text-sm list-disc list-inside space-y-2.5 pl-2">
+                        <li><strong>Cause:</strong> Insulin की कमी या काम न करना.</li>
+                        <li><strong>Type 1:</strong> Beta cells नष्ट हो जाती हैं (No Insulin).</li>
+                        <li><strong>Type 2:</strong> शरीर Insulin का उपयोग नहीं कर पाता.</li>
+                    </ul>
+                </div>
+
+                <!-- Pancreatitis -->
+                <div class="card">
+                    <h3 class="card-title" style="--icon-color: #be123c; --icon-bg: #ffe4e6;"><i class="fa-solid fa-fire icon"></i> Pancreatitis</h3>
+                    <ul class="card-content text-sm list-disc list-inside space-y-2.5 pl-2">
+                        <li><strong>Definition:</strong> Pancreas में सूजन (Inflammation).</li>
+                        <li><strong>Danger:</strong> खुद के Enzymes अंग को पचाने (Auto-digestion) लगते हैं.</li>
+                        <li><strong>Pain:</strong> पेट के ऊपरी हिस्से में तेज दर्द.</li>
+                    </ul>
+                </div>
+
+                <!-- Cancer -->
+                <div class="card">
+                    <h3 class="card-title" style="--icon-color: #b45309; --icon-bg: #fef3c7;"><i class="fa-solid fa-triangle-exclamation icon"></i> Cancer Risk</h3>
+                    <ul class="card-content text-sm list-disc list-inside space-y-2.5 pl-2">
+                        <li><strong>Site:</strong> Head of Pancreas का कैंसर आम है.</li>
+                        <li><strong>Effect:</strong> यह Bile Duct को ब्लॉक कर सकता है.</li>
+                        <li><strong>Symptom:</strong> इससे पीलिया (Jaundice) हो सकता है.</li>
+                    </ul>
+                </div>
+
+                <!-- Lab Tests -->
+                <div class="card">
+                    <h3 class="card-title" style="--icon-color: #15803d; --icon-bg: #d1fae5;"><i class="fa-solid fa-vial icon"></i> Lab Tests</h3>
+                    <ul class="card-content text-sm list-disc list-inside space-y-2.5 pl-2">
+                        <li><strong>Amylase:</strong> Pancreatitis में बढ़ जाता है.</li>
+                        <li><strong>Lipase:</strong> यह ज्यादा Specific टेस्ट है.</li>
+                        <li>Blood Sugar (Fasting/PP).</li>
+                    </ul>
+                </div>
+
+                <!-- Key Fact -->
+                <div class="card">
+                    <h3 class="card-title" style="--icon-color: #701a75; --icon-bg: #f3e8ff;"><i class="fa-solid fa-star icon"></i> Imp Fact</h3>
+                    <ul class="card-content text-sm list-disc list-inside space-y-2.5 pl-2">
+                        <li>Pancreas एक <strong>Accessory Digestive Organ</strong> है.</li>
+                        <li>खाना इसमें नहीं जाता, केवल इसका रस (Juice) जाता है.</li>
+                    </ul>
+                </div>
+
+                <!-- Bottom Recap -->
+                <div class="card sm:col-span-2 lg:col-span-3">
+                    <h3 class="card-title text-gray-700" style="--icon-color: #4b5563; --icon-bg: #e5e7eb;"><i class="fa-solid fa-check-double icon"></i> Quick Exam Recap (Viva)</h3>
+                    <ul class="card-content text-sm list-disc list-inside grid grid-cols-2 md:grid-cols-3 gap-x-4 gap-y-2.5 pl-2">
+                        <li>Dual Gland: Exocrine + Endocrine</li>
+                        <li>Insulin Source: Beta Cells</li>
+                        <li>Digestion: Carbs, Protein, Fat (All 3)</li>
+                        <li>Duct: Wirsung</li>
+                        <li>Location: Retroperitoneal</li>
+                        <li>pH: 8.0 (Alkaline)</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Follow Up Section -->
+        <div class="slide">
+             <div class="flex flex-col h-full justify-center items-center text-center p-6 md:p-12 bg-gradient-to-br from-orange-50 to-red-50">
+                <p class="text-xl md:text-2xl font-semibold text-orange-600 mb-2 md:mb-4">Prepe One Page Notes</p>
+                <h2 class="text-3xl md:text-4xl font-bold text-gray-800 mb-3 md:mb-5">Pancreas Revision Complete!</h2>
+                <p class="text-base md:text-lg text-gray-600 mb-8 md:mb-12">Focus on Enzymes and Hormones for exams.</p>
+                
+                <div class="border-t-2 border-dashed border-orange-200 pt-8 md:pt-10 w-full max-w-4xl">
+                    <a href="#" class="inline-block bg-gradient-to-r from-orange-500 to-red-500 text-white font-bold text-lg md:text-xl py-3 px-8 md:py-4 md:px-10 rounded-full shadow-lg hover:scale-105 transition-transform duration-300">
+                        <i class="fa-solid fa-check-circle mr-2"></i> Mark as Revised
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <button id="download-pdf-btn">
+        <i class="fa-solid fa-file-pdf mr-2"></i> Download PDF
+    </button>
+
+    <script>
+        const downloadPdfBtn = document.getElementById('download-pdf-btn');
+        const loaderOverlay = document.getElementById('loader-overlay');
+
+        downloadPdfBtn.addEventListener('click', async () => {
+            loaderOverlay.style.display = 'flex';
+            
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF({
+                orientation: 'portrait',
+                unit: 'px',
+                format: [1080, 1080]
+            });
+
+            const slides = document.querySelectorAll('.slide');
+            
+            for (let i = 0; i < slides.length; i++) {
+                const slide = slides[i];
+                
+                const canvas = await html2canvas(slide, {
+                    width: 1080,
+                    height: 1080,
+                    scale: 2,
+                    useCORS: true,
+                    backgroundColor: null, 
+                    logging: false,
+                });
+                
+                const finalCanvas = document.createElement('canvas');
+                finalCanvas.width = canvas.width;
+                finalCanvas.height = canvas.height;
+                const ctx = finalCanvas.getContext('2d');
+                
+                const gradient = ctx.createLinearGradient(0, 0, finalCanvas.width, finalCanvas.height);
+                gradient.addColorStop(0, '#fff7ed');
+                gradient.addColorStop(1, '#ffedd5');
+                ctx.fillStyle = gradient;
+                ctx.fillRect(0, 0, finalCanvas.width, finalCanvas.height);
+                
+                ctx.drawImage(canvas, 0, 0);
+
+                const imgData = finalCanvas.toDataURL('image/jpeg', 0.9);
+
+                if (i > 0) {
+                    doc.addPage([1080, 1080], 'portrait');
+                }
+                
+                doc.addImage(imgData, 'JPEG', 0, 0, 1080, 1080);
+            }
+
+            doc.save('Prepe-Pancreas-Anatomy.pdf');
+            loaderOverlay.style.display = 'none';
+        });
+    </script>
+</body>
+</html>
